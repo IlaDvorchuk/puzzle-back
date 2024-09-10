@@ -1,0 +1,36 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserType {
+  id: String!
+  username: String!
+  email: String!
+}
+
+type ImageType {
+  id: String!
+  url: String!
+  user: UserType!
+}
+
+type Query {
+  users: [UserType!]!
+  images: [ImageType!]!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): UserType!
+  uploadImage(uploadImageInput: UploadImageInput!): ImageType!
+}
+
+input CreateUserInput {
+  username: String!
+  email: String!
+  password: String!
+}
+
+input UploadImageInput {
+  url: String!
+  userId: String!
+}
