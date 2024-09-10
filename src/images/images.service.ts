@@ -2,8 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Image } from './image.schema';
-import { UploadImageInput } from './dto/image.dto';
+import { ImageType } from './dto/image.dto';
 import { User } from '../users/user.schema';
+import { FileUpload } from 'graphql-upload-ts';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class ImagesService {
@@ -12,18 +15,23 @@ export class ImagesService {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
-  async upload(uploadImageInput: UploadImageInput): Promise<Image> {
-    const user = await this.userModel.findById(uploadImageInput.userId);
-    if (!user) {
-      throw new Error('User not found');
-    }
+  async upload(file: FileUpload): Promise<ImageType> {
+    const { createReadStream, filename } = file;
+    const uploadPath = path.join(__dirname, '../../uploads', filename);
 
-    const newImage = new this.imageModel({
-      url: uploadImageInput.url,
-      user: user._id,
+    // Сохранение файла на сервер
+    return new Promise((resolve, reject) => {
+      createReadStream()
+        .pipe(fs.createWriteStream(uploadPath))
+        .on('finish', () => {
+          // Верните данные о загруженном изображении (например, URL или путь к файлу)
+          resolve({
+            id: '1',
+            url: `/uploads/${filename}`,
+          });
+        })
+        .on('error', reject);
     });
-
-    return newImage.save();
   }
 
   async findAll(): Promise<Image[]> {

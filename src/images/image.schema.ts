@@ -5,10 +5,11 @@ import { User } from '../users/user.schema';
 @Schema()
 export class Image extends Document {
   @Prop({ required: true })
+  id: string;
+
+  @Prop({ required: true })
   url: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
-  user: User;
 }
 
 export const ImageSchema = SchemaFactory.createForClass(Image);

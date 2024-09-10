@@ -9,8 +9,6 @@ export class ImageType {
   @Field()
   url: string;
 
-  @Field(() => UserType)
-  user: UserType;
 }
 
 @InputType()
