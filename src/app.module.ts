@@ -33,7 +33,8 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'), // Автоматическая генерация схемы
+      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
+      csrfPrevention: false,
     }),
     UsersModule,
     ImagesModule,

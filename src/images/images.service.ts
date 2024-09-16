@@ -6,7 +6,7 @@ import { ImageType } from './dto/image.dto';
 import { User } from '../users/user.schema';
 import { FileUpload } from 'graphql-upload-ts';
 import * as path from 'path';
-import * as fs from 'fs';
+import { createWriteStream } from 'fs';
 
 @Injectable()
 export class ImagesService {
@@ -17,24 +17,40 @@ export class ImagesService {
 
   async upload(file: FileUpload): Promise<ImageType> {
     const { createReadStream, filename } = file;
-    const uploadPath = path.join(__dirname, '../../uploads', filename);
+    const uploadPath = path.join(__dirname, '../../static', filename);
 
-    // Сохранение файла на сервер
-    return new Promise((resolve, reject) => {
+    // Сохраняем файл на сервере с использованием async/await
+    await new Promise((resolve, reject) => {
       createReadStream()
-        .pipe(fs.createWriteStream(uploadPath))
-        .on('finish', () => {
-          // Верните данные о загруженном изображении (например, URL или путь к файлу)
-          resolve({
-            id: '1',
-            url: `/uploads/${filename}`,
-          });
-        })
+        .pipe(createWriteStream(uploadPath))
+        .on('finish', resolve)
         .on('error', reject);
     });
+
+    // Сохраняем URL в базу данных
+    const newImage = new this.imageModel({
+      url: `/${filename}`,
+    });
+
+    const savedImage = await newImage.save();
+
+    // Возвращаем данные о сохраненном изображении
+    return {
+      _id: savedImage._id.toString(),
+      url: savedImage.url,
+    };
   }
 
-  async findAll(): Promise<Image[]> {
-    return this.imageModel.find().populate('user').exec();
+  async findAll(): Promise<Partial<Image>[]> {
+    const images = await this.imageModel.find().exec();
+
+    // Добавляем SERVER_URL в начало url каждого изображения
+    const serverUrl = process.env.SERVER_URL || 'http://localhost:5000';
+    return images.map((image) => {
+      return {
+        _id: image._id, // преобразуем документ Mongoose в обычный объект
+        url: `${serverUrl}${image.url}`, // добавляем SERVER_URL к url
+      };
+    });
   }
 }

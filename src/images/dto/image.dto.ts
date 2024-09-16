@@ -1,14 +1,12 @@
 import { Field, ObjectType, InputType } from '@nestjs/graphql';
-import { UserType } from '../../users/dto/user.dto';
 
 @ObjectType()
 export class ImageType {
   @Field()
-  id: string;
+  _id: string;
 
   @Field()
   url: string;
-
 }
 
 @InputType()

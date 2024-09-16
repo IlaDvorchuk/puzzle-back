@@ -9,9 +9,8 @@ type UserType {
 }
 
 type ImageType {
-  id: String!
+  _id: String!
   url: String!
-  user: UserType!
 }
 
 type Query {
@@ -21,7 +20,7 @@ type Query {
 
 type Mutation {
   createUser(createUserInput: CreateUserInput!): UserType!
-  uploadImage(uploadImageInput: UploadImageInput!): ImageType!
+  uploadImage(file: Upload!): ImageType!
 }
 
 input CreateUserInput {
@@ -30,7 +29,5 @@ input CreateUserInput {
   password: String!
 }
 
-input UploadImageInput {
-  url: String!
-  userId: String!
-}
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
