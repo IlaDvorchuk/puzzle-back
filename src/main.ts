@@ -6,7 +6,13 @@ import { graphqlUploadExpress } from 'graphql-upload-ts';
 async function bootstrap() {
   const PORT = process.env.PORT || 5000;
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: [process.env.CLIENT_URL, '*'],
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
+    },
+  });
   app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
 
   const config = new DocumentBuilder()
